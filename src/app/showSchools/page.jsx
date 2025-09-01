@@ -3,19 +3,16 @@
 import { useEffect, useState } from "react";
 
 const StarRating = ({ rating }) => {
-    // This component renders a star rating based on the rating prop.
-    const stars = "⭐".repeat(rating);
+    const stars = "⭐".repeat(Number(rating) || 0);
     return <span className="text-yellow-400">{stars}</span>;
 };
 
 const SchoolCard = ({ school }) => {
     const handleApply = () => {
-        // Implement your "Apply Now" logic here, e.g., navigate to a form.
         console.log(`Applying to ${school.name}`);
     };
 
     const handleCompare = () => {
-        // Implement your "Add to Compare" logic here.
         console.log(`Adding ${school.name} to compare list`);
     };
 
@@ -26,7 +23,7 @@ const SchoolCard = ({ school }) => {
             });
             if (res.ok) {
                 alert("School deleted successfully!");
-                window.location.reload(); // quick refresh after delete
+                window.location.reload();
             } else {
                 alert("Failed to delete school.");
             }
@@ -35,11 +32,9 @@ const SchoolCard = ({ school }) => {
         }
     };
 
-
     return (
         <div className="relative overflow-hidden rounded-3xl shadow-lg hover:shadow-xl transition-shadow duration-300 transform hover:-translate-y-1 bg-white">
             <div className="relative">
-                {/* Use the image path from your original logic */}
                 {school.image && (
                     <img
                         src={`/schoolImages/${school.image}`}
@@ -58,7 +53,6 @@ const SchoolCard = ({ school }) => {
             </div>
             <div className="p-4">
                 <div className="flex justify-between items-center mb-1">
-                    {/* Assuming your API returns a rating and a board property */}
                     {school.rating && <StarRating rating={school.rating} />}
                     {school.board && <span className="text-xs font-semibold text-gray-500 uppercase">{school.board}</span>}
                 </div>
@@ -80,7 +74,6 @@ const SchoolCard = ({ school }) => {
                     Delete
                 </button>
             </div>
-
         </div>
     );
 };
@@ -94,9 +87,18 @@ export default function ShowSchools() {
             try {
                 const res = await fetch("/api/getSchools");
                 const data = await res.json();
-                setSchools(data);
+
+                // ✅ Ensure it’s always an array
+                if (Array.isArray(data)) {
+                    setSchools(data);
+                } else if (Array.isArray(data.schools)) {
+                    setSchools(data.schools);
+                } else {
+                    setSchools([]); // fallback
+                }
             } catch (err) {
                 console.error("Error fetching schools:", err);
+                setSchools([]);
             }
             setLoading(false);
         }
