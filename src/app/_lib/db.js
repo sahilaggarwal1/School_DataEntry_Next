@@ -7,7 +7,7 @@ export async function connectDB() {
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    port: 10479,
+    port: process.env.DB_PORT,
     ssl: {
       ca: fs.readFileSync("ca.pem")  // upload this file in your project root
     }
